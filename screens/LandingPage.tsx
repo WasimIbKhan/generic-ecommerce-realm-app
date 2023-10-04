@@ -2,11 +2,10 @@ import React from 'react';
 import { View, Text, StyleSheet, Button } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import * as authActions from '../store/actions/auth';
-import { AppDispatch } from '../App';
-import { useDispatch } from 'react-redux';
+import { AppDispatch, RootState } from '../App';
+import { useDispatch, useSelector } from 'react-redux';
 const LandingPage = () => {
   const dispatch = useDispatch<AppDispatch>();
-
   return (
     <View style={styles.screen}>
       <Text>Welcome to the Landing Page!</Text>

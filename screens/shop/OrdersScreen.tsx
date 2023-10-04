@@ -14,18 +14,25 @@ import HeaderButton from '../../components/UI/HeaderButton';
 import OrderItem from '../../components/shop/OrderItem';
 import * as ordersActions from '../../store/actions/orders';
 import Colors from '../../constants/Colors';
+import { AppDispatch } from '../../App';
 
-const OrdersScreen = props => {
+interface Order {
+  id: string;
+  totalAmount: number;
+  readableDate: string;
+  items: any[]; // Define a type for items based on its structure
+}
+
+const OrdersScreen = (props: any) => { // Define a type for props if possible
   const [isLoading, setIsLoading] = useState(false);
 
-  const orders = useSelector(state => state.orders.orders);
-  const dispatch = useDispatch();
+  const orders = useSelector((state: any) => state.orders.orders); // Define a type for state
+  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     setIsLoading(true);
-    dispatch(ordersActions.fetchOrders()).then(() => {
-      setIsLoading(false);
-    });
+    dispatch(ordersActions.fetchOrders())
+    setIsLoading(false);
   }, [dispatch]);
 
   if (isLoading) {
@@ -47,19 +54,19 @@ const OrdersScreen = props => {
   return (
     <FlatList
       data={orders}
-      keyExtractor={item => item.id}
-      renderItem={itemData => (
+      keyExtractor={(item: Order) => item.id}
+      renderItem={({item}: {item: Order}) => (
         <OrderItem
-          amount={itemData.item.totalAmount}
-          date={itemData.item.readableDate}
-          items={itemData.item.items}
+          amount={item.totalAmount}
+          date={item.readableDate}
+          items={item.items}
         />
       )}
     />
   );
 };
 
-export const screenOptions = navData => {
+export const screenOptions = (navData: any) => { // Define a type for navData
   return {
     headerTitle: 'Your Orders',
     headerLeft: () => (

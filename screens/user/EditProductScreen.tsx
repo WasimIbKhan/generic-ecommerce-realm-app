@@ -15,10 +15,34 @@ import HeaderButton from '../../components/UI/HeaderButton';
 import * as productsActions from '../../store/actions/products';
 import Input from '../../components/UI/Input';
 import Colors from '../../constants/Colors';
+import { AppDispatch } from '../../App';
 
 const FORM_INPUT_UPDATE = 'FORM_INPUT_UPDATE';
 
-const formReducer = (state, action) => {
+interface FormState {
+  inputValues: {
+    title: string;
+    imageUrl: string;
+    description: string;
+    price: string;
+  };
+  inputValidities: {
+    title: boolean;
+    imageUrl: boolean;
+    description: boolean;
+    price: boolean;
+  };
+  formIsValid: boolean;
+}
+
+interface FormAction {
+  type: typeof FORM_INPUT_UPDATE;
+  input: string;
+  value: string;
+  isValid: boolean;
+}
+
+const formReducer = (state: FormState, action: FormAction) => {
   if (action.type === FORM_INPUT_UPDATE) {
     const updatedValues = {
       ...state.inputValues,
@@ -41,16 +65,15 @@ const formReducer = (state, action) => {
   return state;
 };
 
-const EditProductScreen = props => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState();
+const EditProductScreen = (props: any) => { // Consider defining a type/interface for `props`
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   const prodId = props.route.params ? props.route.params.productId : null;
-  const editedProduct = useSelector(state =>
-    state.products.userProducts.find(prod => prod.id === prodId)
+  const editedProduct = useSelector((state: any) => // Consider defining a type/interface for `state`
+    state.products.userProducts.find((prod: any) => prod.id === prodId) // Consider defining a type/interface for `prod`
   );
-  const dispatch = useDispatch();
-
+  const dispatch = useDispatch<AppDispatch>();
   const [formState, dispatchFormState] = useReducer(formReducer, {
     inputValues: {
       title: editedProduct ? editedProduct.title : '',

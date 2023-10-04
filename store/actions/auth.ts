@@ -45,8 +45,12 @@ export const signup = (email: string, fullname: string, phoneNumber: string, add
       console.log(response.data);
       // Authenticate with Realm using email/password
       console.log(email, password)
+      
       try {
-        await app.emailPasswordAuth.registerUser(email, password);
+        await await app.emailPasswordAuth.registerUser({
+          email: email,
+          password: password,
+        });
         // Success handling
     } catch (e) {
         console.error("Registration error", e);

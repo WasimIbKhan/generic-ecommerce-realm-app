@@ -12,11 +12,30 @@ import { useSelector, useDispatch } from 'react-redux';
 import Colors from '../../constants/Colors';
 import * as cartActions from '../../store/actions/cart';
 
-const ProductDetailScreen = props => {
+interface Product {
+  id: string;
+  imageUrl: string;
+  price: number;
+  description: string;
+}
+
+interface RouteParams {
+  productId: string;
+  productTitle?: string;
+}
+
+interface Props {
+  route: {
+    params: RouteParams;
+  };
+  navigation: any; // You may want to define a type for navigation
+}
+
+const ProductDetailScreen = (props: Props) => {
   const productId = props.route.params.productId;
-  const selectedProduct = useSelector(state =>
-    state.products.availableProducts.find(prod => prod.id === productId)
-  );
+  const selectedProduct = useSelector((state: any) =>
+    state.products.availableProducts.find((prod: Product) => prod.id === productId)
+  )!;
   const dispatch = useDispatch();
 
   return (
@@ -31,13 +50,13 @@ const ProductDetailScreen = props => {
           }}
         />
       </View>
-      <Text style={styles.price}>${selectedProduct.price}</Text>
+      <Text style={styles.price}>${selectedProduct.price.toFixed(2)}</Text>
       <Text style={styles.description}>{selectedProduct.description}</Text>
     </ScrollView>
   );
 };
 
-export const screenOptions = navData => {
+export const screenOptions = (navData: { route: { params: RouteParams } }) => {
   return {
     headerTitle: navData.route.params.productTitle
   };

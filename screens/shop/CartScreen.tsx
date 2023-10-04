@@ -8,18 +8,28 @@ import {
   ActivityIndicator
 } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
-
 import Colors from '../../constants/Colors';
 import CartItem from '../../components/shop/CartItem';
 import Card from '../../components/UI/Card';
 import * as cartActions from '../../store/actions/cart';
 import * as ordersActions from '../../store/actions/orders';
-const CartScreen = props => {
+import { AppDispatch } from '../../App';
+
+// Defining types
+interface CartItem {
+  productId: string;
+  productTitle: string;
+  productPrice: number;
+  quantity: number;
+  sum: number;
+}
+
+const CartScreen = (props: any) => { // You might want to replace 'any' with a specific type once you define the type for your props.
   const [isLoading, setIsLoading] = useState(false);
 
-  const cartTotalAmount = useSelector(state => state.cart.totalAmount);
-  const cartItems = useSelector(state => {
-    const transformedCartItems = [];
+  const cartTotalAmount = useSelector((state: any) => state.cart.totalAmount); // Define a type for your state.
+  const cartItems = useSelector((state: any) => { // Define a type for your state.
+    const transformedCartItems: CartItem[] = [];
     for (const key in state.cart.items) {
       transformedCartItems.push({
         productId: key,
@@ -33,7 +43,8 @@ const CartScreen = props => {
       a.productId > b.productId ? 1 : -1
     );
   });
-  const dispatch = useDispatch();
+
+  const dispatch = useDispatch<AppDispatch>();
 
   const sendOrderHandler = async () => {
     setIsLoading(true);
@@ -63,15 +74,15 @@ const CartScreen = props => {
       </Card>
       <FlatList
         data={cartItems}
-        keyExtractor={item => item.productId}
-        renderItem={itemData => (
+        keyExtractor={(item: CartItem) => item.productId}
+        renderItem={({item}: {item: CartItem}) => (
           <CartItem
-            quantity={itemData.item.quantity}
-            title={itemData.item.productTitle}
-            amount={itemData.item.sum}
+            quantity={item.quantity}
+            title={item.productTitle}
+            amount={item.sum}
             deletable
             onRemove={() => {
-              dispatch(cartActions.removeFromCart(itemData.item.productId));
+              dispatch(cartActions.removeFromCart(item.productId));
             }}
           />
         )}

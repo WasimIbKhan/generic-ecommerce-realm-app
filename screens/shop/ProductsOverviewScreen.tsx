@@ -10,35 +10,57 @@ import {
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
-
 import axios from 'axios';
-
+import algoliasearch from "algoliasearch";
+import { InstantSearch } from "react-instantsearch-native";
 import HeaderButton from "../../components/UI/HeaderButton";
 import ProductHitItem from "../../components/shop/ProductHitItem";
 import ProductItem from "../../components/shop/ProductItem";
 import * as cartActions from "../../store/actions/cart";
 import * as productsActions from "../../store/actions/products";
 import Colors from "../../constants/Colors";
-
-import algoliasearch from "algoliasearch";
-import { InstantSearch } from "react-instantsearch-native";
 import SearchBox from "../../components/UI/SearchBox";
-import InfiniteHits from "../../components/UI/InfiniteHits";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import InfiniteHits from "../../components/UI/InfininiteHits";
+import { AppDispatch } from "../../App";
 
-const ProductsOverviewScreen = (props) => {
+interface Product {
+  id: string;
+  imageUrl: string;
+  title: string;
+  description: string;
+  price: number;
+}
+
+interface Props {
+  navigation: {
+    navigate: (scene: string, params?: any) => void;
+    toggleDrawer: () => void;
+    addListener: (
+      event: string,
+      callback: () => void
+    ) => { remove: () => void };
+  };
+  route: {
+    params: {
+      productId: string;
+      productTitle: string;
+    };
+  };
+}
+
+const ProductsOverviewScreen: React.FC<Props> = (props) => {
   const searchClient = algoliasearch(
     "QNMIJGZQVG",
     "78701f3e2c1e8c9d64f822c3f0175eab"
   );
 
-  const [response, setResponse] = useState()
-  const [isLoading, setIsLoading] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [error, setError] = useState();
-  const [focus, setFocus] = useState();
-  const products = useSelector((state) => state.products.availableProducts);
-  const dispatch = useDispatch();
+  const [response, setResponse] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [focus, setFocus] = useState<boolean>(false);
+  const products = useSelector((state: any) => state.products.availableProducts);
+  const dispatch = useDispatch<AppDispatch>();
 
   const loadProducts = useCallback(async () => {
     setError(null);
@@ -66,32 +88,15 @@ const ProductsOverviewScreen = (props) => {
     });
   }, [dispatch, loadProducts]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Replace 'YOUR_COMPUTER_IP' with your computer's LAN IP address
-        axios.get('http://192.168.1.99:5000/recommendations').then((response) => {
-          dispatch(productsActions.addMultiProduct(response.data))
-          console.log(response.data)
-        })
-        
-      } catch (error) {
-        console.error("Error fetching recommendations:", error.message);
-        console.error("Error details:", error);
-      }
-    };
-    setResponse(response)
-    fetchData();
-  }, []);
 
-  const selectItemHandler = (id, title) => {
+  const selectItemHandler = (id: string, title: string) => {
     props.navigation.navigate("ProductDetail", {
       productId: id,
       productTitle: title,
     });
   };
 
-  const SearchedProductItem = (item, navigation) => {
+  const SearchedProductItem = (item: any, navigation: any) => {
     return (
       <ProductHitItem
         hit={item}
@@ -154,14 +159,13 @@ const ProductsOverviewScreen = (props) => {
           onRefresh={loadProducts}
           refreshing={isRefreshing}
           data={products}
-          keyExtractor={(item) => item.id}
-          renderItem={(itemData) => (
+          keyExtractor={(item: Product) => item.id}
+          renderItem={(itemData: {item: Product}) => (
             <ProductItem
               image={itemData.item.imageUrl}
               title={itemData.item.title}
               description={itemData.item.description}
               price={itemData.item.price}
-              isEdit={false}
               onSelect={() => {
                 selectItemHandler(itemData.item.id, itemData.item.title);
               }}
@@ -176,7 +180,7 @@ const ProductsOverviewScreen = (props) => {
   );
 };
 
-export const screenOptions = (navData) => {
+export const screenOptions = (navData: any) => {
   return {
     headerTitle: "All Products",
     headerLeft: () => (

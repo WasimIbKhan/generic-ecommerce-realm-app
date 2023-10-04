@@ -20,7 +20,7 @@ interface ProductItemProps {
   price: number;
   isEdit?: boolean;
   onSelect: () => void;
-  onAdd: () => void;
+  onAdd?: () => void;
 }
 
 const ProductItem: React.FC<ProductItemProps> = (props) => {
