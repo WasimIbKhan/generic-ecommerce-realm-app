@@ -4,7 +4,6 @@ import { Provider } from 'react-redux';
 import ReduxThunk, { ThunkAction, ThunkDispatch } from "redux-thunk";
 import authReducer from './store/reducer/auth';
 import AppNavigator from './navigation/AppNavigator';
-import { RealmProvider } from '@realm/react';
 
 const rootReducer = combineReducers({
   auth: authReducer
@@ -16,18 +15,10 @@ export type AppDispatch = Dispatch<Action<string>> & ThunkDispatch<RootState, un
 const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
 
 export default function App() {
-  const UserSchema = {
-    name: 'User',
-    properties: {
-      email: 'string',
-      password: 'string'
-    }
-  };
+
   return (
     <Provider store={store}>
-      <RealmProvider schema={[UserSchema]}>
         <AppNavigator />
-      </RealmProvider>
     </Provider>
   );
 }

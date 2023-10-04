@@ -4,6 +4,10 @@ export const AUTHENTICATE = 'AUTHENTICATE';
 export const LOGOUT = 'LOGOUT';
 export const SET_DID_TRY_AL = 'SET_DID_TRY_AL';
 
+import app from '../../realmConfig';
+
+import axios from 'axios';
+
 export interface AuthenticateAction {
     type: typeof AUTHENTICATE;
     userId: string;
@@ -23,7 +27,9 @@ export type AuthActionTypes = AuthenticateAction | SetDidTryALAction | LogoutAct
   
 
 export const setDidTryAL = () => {
-  return { type: typeof SET_DID_TRY_AL };
+  return async (dispatch: Dispatch<AuthActionTypes>) => {
+    dispatch({ type: SET_DID_TRY_AL });
+  }
 };
 
 export const authenticate = (userId: string, token: string): AuthenticateAction => {
@@ -33,24 +39,53 @@ export const authenticate = (userId: string, token: string): AuthenticateAction 
 export const signup = (email: string, fullname: string, phoneNumber: string, address: string, password: string) => {
   return async (dispatch: Dispatch<AuthActionTypes>) => {
     try {
-    
-        dispatch(authenticate('1', 'token'));
-    
+      // Sign up user in your Express server
+      const response = await axios.post('http://10.0.2.2:3000/signup', { email, password, fullname, phoneNumber, address });
+      const { token, userId } = response.data;
+      console.log(response.data);
+      // Authenticate with Realm using email/password
+      console.log(email, password)
+      try {
+        await app.emailPasswordAuth.registerUser(email, password);
+        // Success handling
+    } catch (e) {
+        console.error("Registration error", e);
+        // Error handling
+    }
+      // Dispatch an action to update Redux store
+      dispatch(authenticate(userId, token));
+
+      // Store token and userId in AsyncStorage
+      saveDataToStorage(token, userId);
     } catch (error) {
-      console.log(error);
+      // Handle error
     }
   };
 };
 
+
 export const login = (email: string, password: string) => {
   return async (dispatch: Dispatch<AuthActionTypes>) => {
     try {
-        dispatch(authenticate('1', 'token'));
+      // Log in user in your Express server
+      const response = await axios.post('http://10.0.2.2:3000/login', { email, password });
+      const { token, userId } = response.data;
+
+      // Authenticate with Realm using email/password
+      const credentials = Realm.Credentials.emailPassword(email, password);
+      const realmUser = await app.logIn(credentials);
+
+      // Dispatch an action to update Redux store
+      dispatch(authenticate(userId, token));
+
+      // Store token and userId in AsyncStorage
+      saveDataToStorage(token, userId);
     } catch (error) {
-      console.log(error);
+      // Handle error
     }
   };
 };
+
 
 export const logout = () => {
   AsyncStorage.removeItem('userData');

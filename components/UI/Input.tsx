@@ -1,8 +1,25 @@
-import React from 'react';
-import { View, Text, TextInput, StyleSheet } from 'react-native';
+import React, { useReducer, useEffect } from 'react';
+import { View, Text, TextInput, StyleSheet, StyleProp, TextStyle } from 'react-native';
 import Colors from '../../constants/Colors';
 
-interface InputProps {
+const INPUT_CHANGE = 'INPUT_CHANGE';
+const INPUT_BLUR = 'INPUT_BLUR';
+
+interface InputState {
+  value: string;
+  isValid: boolean;
+  touched: boolean;
+}
+
+interface Action {
+  type: string;
+  value?: string;
+  isValid?: boolean;
+}
+
+interface Props {
+  initialValue?: string;
+  initiallyValid?: boolean;
   onInputChange: (id: string, value: string, isValid: boolean) => void;
   id: string;
   label: string;
@@ -11,13 +28,47 @@ interface InputProps {
   min?: number;
   max?: number;
   minLength?: number;
-  errorText?: string; 
-  [key: string]: any;
+  style?: StyleProp<TextStyle>;
+  errorText?: string;
+  [x: string]: any; // for other TextInput props which might not be defined
 }
 
-const Input: React.FC<InputProps> = (props) => {
+const inputReducer = (state: InputState, action: Action): InputState => {
+  switch (action.type) {
+    case INPUT_CHANGE:
+      return {
+        ...state,
+        value: action.value!,
+        isValid: action.isValid!,
+      };
+    case INPUT_BLUR:
+      return {
+        ...state,
+        touched: true,
+      };
+    default:
+      return state;
+  }
+};
+
+const Input: React.FC<Props> = (props) => {
+
+  const [inputState, dispatch] = useReducer(inputReducer, {
+    value: props.initialValue ? props.initialValue : '',
+    isValid: props.initiallyValid ?? true, // provide a default value
+    touched: false
+  });  
+  
+  const { onInputChange, id } = props;
+
+  useEffect(() => {
+    if (inputState.touched) {
+      onInputChange(id, inputState.value, inputState.isValid);
+    }
+  }, [inputState, onInputChange, id, props.value]); // Include props.value as a dependency
+
   const textChangeHandler = (text: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     let isValid = true;
     if (props.required && text.trim().length === 0) {
       isValid = false;
@@ -34,7 +85,11 @@ const Input: React.FC<InputProps> = (props) => {
     if (props.minLength != null && text.length < props.minLength) {
       isValid = false;
     }
-    props.onInputChange(props.id, text, isValid);
+    dispatch({ type: INPUT_CHANGE, value: text, isValid: isValid });
+  };
+
+  const lostFocusHandler = () => {
+    dispatch({ type: INPUT_BLUR });
   };
 
   return (
@@ -43,9 +98,11 @@ const Input: React.FC<InputProps> = (props) => {
       <TextInput
         {...props}
         style={styles.input}
+        value={inputState.value}
         onChangeText={textChangeHandler}
+        onBlur={lostFocusHandler}
       />
-      {props.initialValue && (
+      {!inputState.isValid && inputState.touched && (
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>{props.errorText}</Text>
         </View>
@@ -57,6 +114,9 @@ const Input: React.FC<InputProps> = (props) => {
 const styles = StyleSheet.create({
   formControl: {
     width: '100%'
+  },
+  label: {
+    marginVertical: 8
   },
   inputLabel: {
     fontSize: 17,

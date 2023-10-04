@@ -1,11 +1,16 @@
 import React from 'react';
 import { View, Text, StyleSheet, Button } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import * as authActions from '../store/actions/auth';
+import { AppDispatch } from '../App';
+import { useDispatch } from 'react-redux';
+const LandingPage = () => {
+  const dispatch = useDispatch<AppDispatch>();
 
-const LandingPage = ({ navigation }) => {
   return (
     <View style={styles.screen}>
       <Text>Welcome to the Landing Page!</Text>
-      <Button title="Logout" onPress={() => navigation.navigate('Auth')} />
+      <Button title="Logout" onPress={() => dispatch(authActions.logout())} />
     </View>
   );
 };
