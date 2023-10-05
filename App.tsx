@@ -3,9 +3,15 @@ import { createStore, combineReducers, applyMiddleware, Action, Dispatch } from 
 import { Provider } from 'react-redux';
 import ReduxThunk, { ThunkAction, ThunkDispatch } from "redux-thunk";
 import authReducer from './store/reducer/auth';
+import productsReducer from './store/reducer/products';
+import cartReducer from './store/reducer/cart';
 import AppNavigator from './navigation/AppNavigator';
+import ordersReducer from './store/reducer/orders';
 
 const rootReducer = combineReducers({
+  products: productsReducer,
+  cart: cartReducer,
+  orders: ordersReducer,
   auth: authReducer
 });
 

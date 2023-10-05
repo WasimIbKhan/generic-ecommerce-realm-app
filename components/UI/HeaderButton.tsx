@@ -2,7 +2,7 @@
 import React from 'react';
 import { Platform } from 'react-native';
 import { HeaderButton, HeaderButtonProps } from 'react-navigation-header-buttons';
-import { Ionicons } from '@expo/vector-icons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import Colors from '../../constants/Colors';
 interface CustomHeaderButtonProps extends HeaderButtonProps {
     // Your custom props here if you have any

@@ -4,7 +4,7 @@ import { StyleSheet, View, Dimensions } from 'react-native';
 import PropTypes from 'prop-types';
 import { connectSearchBox } from 'react-instantsearch-native';
 import { Searchbar } from 'react-native-paper';
-import { AntDesign } from '@expo/vector-icons';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 interface SearchBoxProps {
   currentRefinement: string;

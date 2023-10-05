@@ -10,7 +10,6 @@ import {
   Alert
 } from 'react-native';
 import Colors from '../../constants/Colors';
-import { Ionicons } from '@expo/vector-icons';
 import Card from '../UI/Card';
 
 interface ProductItemProps {

@@ -11,6 +11,8 @@ export const SET_PRODUCTS = 'SET_PRODUCTS';
 
 // Define action types
 
+import PRODUCTS from '../../data/dummy-data';
+
 interface DeleteProductAction {
   type: typeof DELETE_PRODUCT;
   pid: string;
@@ -61,7 +63,7 @@ export type ProductActions =
 export const fetchProducts = (): ThunkAction<void, RootState, unknown, Action<string>> => {
   return async (dispatch, getState) => {
     const userId = getState().auth.userId;
-    const loadedProducts = []; // Define product type and structure
+    const loadedProducts = PRODUCTS; // Define product type and structure
     try {
       // Fetch products...
       dispatch({ 

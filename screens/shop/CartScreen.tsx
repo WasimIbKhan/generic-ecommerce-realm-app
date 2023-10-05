@@ -13,7 +13,7 @@ import CartItem from '../../components/shop/CartItem';
 import Card from '../../components/UI/Card';
 import * as cartActions from '../../store/actions/cart';
 import * as ordersActions from '../../store/actions/orders';
-import { AppDispatch } from '../../App';
+import { AppDispatch, RootState } from '../../App';
 
 // Defining types
 interface CartItem {
@@ -27,8 +27,8 @@ interface CartItem {
 const CartScreen = (props: any) => { // You might want to replace 'any' with a specific type once you define the type for your props.
   const [isLoading, setIsLoading] = useState(false);
 
-  const cartTotalAmount = useSelector((state: any) => state.cart.totalAmount); // Define a type for your state.
-  const cartItems = useSelector((state: any) => { // Define a type for your state.
+  const cartTotalAmount = useSelector((state: RootState) => state.cart.totalAmount); // Define a type for your state.
+  const cartItems = useSelector((state: RootState) => { // Define a type for your state.
     const transformedCartItems: CartItem[] = [];
     for (const key in state.cart.items) {
       transformedCartItems.push({

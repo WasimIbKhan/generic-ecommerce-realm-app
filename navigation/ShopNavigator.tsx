@@ -7,7 +7,7 @@ import {
   DrawerContentComponentProps,
 } from '@react-navigation/drawer';
 import { Platform, SafeAreaView, Button, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useDispatch } from 'react-redux';
 
 import ProductsOverviewScreen, {
