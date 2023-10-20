@@ -8,6 +8,7 @@ import cors from 'cors';
 dotenv.config();
 
 const MONGODB_URI = process.env.MONGODB_URI;
+console.log('MONGODB_URI:', process.env.MONGODB_URI);
 const JWT_SECRET = process.env.JWT_SECRET;
 
 const app = express();
@@ -24,6 +25,28 @@ const userSchema = new mongoose.Schema({
   address: String
 });
 const User = mongoose.model('User', userSchema, 'users'); // Specifying 'users' collection explicitly
+
+const productSchema = new mongoose.Schema({
+  product_id: String,
+  product_name: String,
+  category: String,
+  discounted_price: Number,
+  actual_price: Number,
+  discount_percentage: Number,
+  rating: Number,
+  rating_count: Number,
+  about_product: String,
+  user_id: String,
+  user_name: String,
+  review_id: String,
+  review_title: String,
+  review_content: String,
+  img_link: String,
+  product_link: String
+});
+
+const Product = mongoose.model('Product', productSchema, 'products'); // Specifying 'products' collection explicitly
+
 
 app.post('/signup', async (req, res) => {
   try {
@@ -52,4 +75,4 @@ app.post('/login', async (req, res) => {
   }
 });
 
-app.listen(3000, () => console.log('Server is running on port 3000'));
+app.listen(3000, () => console.log(`Server is running on port 3000 => \n ${process.env}`));
