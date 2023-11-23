@@ -7,6 +7,7 @@ import productsReducer from './store/reducer/products';
 import cartReducer from './store/reducer/cart';
 import AppNavigator from './navigation/AppNavigator';
 import ordersReducer from './store/reducer/orders';
+import { LogBox } from 'react-native';
 
 const rootReducer = combineReducers({
   products: productsReducer,
@@ -21,7 +22,7 @@ export type AppDispatch = Dispatch<Action<string>> & ThunkDispatch<RootState, un
 const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
 
 export default function App() {
-
+  LogBox.ignoreAllLogs(true)
   return (
     <Provider store={store}>
         <AppNavigator />

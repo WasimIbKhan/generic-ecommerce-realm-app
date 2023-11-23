@@ -12,6 +12,8 @@ export const SET_PRODUCTS = 'SET_PRODUCTS';
 // Define action types
 
 import PRODUCTS from '../../data/dummy-data';
+import axios from 'axios';
+import Product from '../../models/product';
 
 interface DeleteProductAction {
   type: typeof DELETE_PRODUCT;
@@ -51,7 +53,7 @@ interface UpdateProductsAction {
   products: any[]; // Make sure to define a proper type for products
 }
 
-export type ProductActions = 
+export type ProductActions =
   | DeleteProductAction
   | CreateProductAction
   | UpdateProductAction
@@ -60,13 +62,51 @@ export type ProductActions =
 
 // Define action creators
 
-export const fetchProducts = (): ThunkAction<void, RootState, unknown, Action<string>> => {
+export const fetchProducts = (page: number): ThunkAction<void, RootState, unknown, Action<string>> => {
   return async (dispatch, getState) => {
     const userId = getState().auth.userId;
-    const loadedProducts = PRODUCTS; // Define product type and structure
     try {
-      // Fetch products...
-      dispatch({ 
+      const response = await axios.get(`http://10.0.2.2:3000/products?page=${page}`);
+      if (!response.data) {
+        throw new Error('Something went wrong!');
+      }
+
+      const products = await response.data;
+
+      const loadedProducts = products.map(prod => {
+        // Remove ₹, divide by 100, and round to get an integer for discounted_price
+        const discountedPrice = parseFloat(prod.discounted_price.replace('₹', ''));
+
+        // Remove ₹, divide by 100, and round to get an integer for actual_price
+        const actualPrice = parseFloat(prod.actual_price.replace('₹', ''));
+
+        return new Product(
+          prod.product_id,
+          prod.user_id, // Assuming user_id is the ownerId
+          prod.product_name,
+          prod.img_link,
+          prod.about_product,
+          discountedPrice, // Convert the integer back to string for the Product model
+          prod.product_id,
+          prod.weighted_rating,
+          prod.category,
+          discountedPrice,
+          actualPrice,
+          prod.discount_percentage,
+          prod.rating,
+          prod.rating_count,
+          prod.about_product,
+          prod.user_id,
+          prod.user_name,
+          prod.review_id,
+          prod.review_title,
+          prod.review_content,
+          prod.product_link
+        );
+      });
+
+
+      dispatch({
         type: SET_PRODUCTS,
         products: loadedProducts,
         userProducts: loadedProducts.filter(prod => prod.ownerId === userId)

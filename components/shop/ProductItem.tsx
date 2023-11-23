@@ -31,7 +31,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
         </View>
         <View style={styles.details}>
           <View style={styles.upperLayer}>
-            <Text style={styles.title}>{props.title}</Text>
+            <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">{props.title}</Text>
             <Text style={styles.description} numberOfLines={4} ellipsizeMode="tail">
               {props.description}
             </Text>

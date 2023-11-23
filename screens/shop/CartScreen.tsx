@@ -58,7 +58,7 @@ const CartScreen = (props: any) => { // You might want to replace 'any' with a s
         <Text style={styles.summaryText}>
           Total:{' '}
           <Text style={styles.amount}>
-            ${Math.round(cartTotalAmount.toFixed(2) * 100) / 100}
+            ${Math.round(cartTotalAmount * 100) / 100}
           </Text>
         </Text>
         {isLoading ? (

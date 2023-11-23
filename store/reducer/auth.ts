@@ -27,7 +27,6 @@ const authReducer = (state = initialState, action: AuthActionTypes): AuthState =
         didTryAutoLogin: true,
       };
     case LOGOUT:
-        console.log('here')
       return {
         ...initialState
       };

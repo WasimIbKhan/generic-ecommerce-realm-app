@@ -5,7 +5,8 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Platform
+  Platform,
+  Dimensions
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -22,10 +23,10 @@ const CartItem: React.FC<CartItemProps> = (props) => {
     <View style={styles.cartItem}>
       <View style={styles.itemData}>
         <Text style={styles.quantity}>{props.quantity} </Text>
-        <Text style={styles.mainText}>{props.title}</Text>
+        <Text style={styles.mainText}  numberOfLines={1} ellipsizeMode="tail">{props.title}</Text>
       </View>
       <View style={styles.itemData}>
-        <Text style={styles.mainText}>${props.amount.toFixed(2)}</Text>
+        <Text style={styles.mainText}>${props.amount}</Text>
         {props.deletable && (
           <TouchableOpacity
             onPress={props.onRemove}
@@ -53,7 +54,8 @@ const styles = StyleSheet.create({
   },
   itemData: {
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
+    width: Dimensions.get('window').width * 0.5,
   },
   quantity: {
     color: '#888',

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ScrollView,
   View,
@@ -11,13 +11,9 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import Colors from '../../constants/Colors';
 import * as cartActions from '../../store/actions/cart';
+import axios from 'axios';
+import Product from '../../models/product';
 
-interface Product {
-  id: string;
-  imageUrl: string;
-  price: number;
-  description: string;
-}
 
 interface RouteParams {
   productId: string;
@@ -38,6 +34,56 @@ const ProductDetailScreen = (props: Props) => {
   )!;
   const dispatch = useDispatch();
 
+  const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    // Fetch recommended products when the component is loaded
+    axios.post('http://10.0.2.2:5000/get_recommendations', { product_id: productId })
+      .then(response => {
+        const rawData = response.data;
+
+        // Transform the data to match the expected structure using the Product model
+        const structuredProducts = rawData.map(prod => {
+          // Remove ₹, divide by 100, and round to get an integer for discounted_price
+        const discountedPrice = parseFloat(prod.discounted_price.replace('₹', ''));
+
+        // Remove ₹, divide by 100, and round to get an integer for actual_price
+        const actualPrice = parseFloat(prod.actual_price.replace('₹', ''));
+
+          return new Product(
+            prod.product_id,
+            prod.user_id, // Assuming user_id is the ownerId
+            prod.product_name,
+            prod.img_link,
+            prod.about_product,
+            discountedPrice, // Convert the integer back to string for the Product model
+            prod.product_id,
+            prod.weighted_rating,
+            prod.category,
+            discountedPrice,
+            actualPrice,
+            prod.discount_percentage,
+            prod.rating,
+            prod.rating_count,
+            prod.about_product,
+            prod.user_id,
+            prod.user_name,
+            prod.review_id,
+            prod.review_title,
+            prod.review_content,
+            prod.product_link
+          );
+        });
+
+        console.log(structuredProducts);
+        setRecommendedProducts(structuredProducts);
+      })
+      .catch(error => {
+        console.error("Error fetching recommendations:", error);
+      });
+  }, [productId]);
+
+  
   return (
     <ScrollView>
       <Image style={styles.image} source={{ uri: selectedProduct.imageUrl }} />
@@ -50,8 +96,18 @@ const ProductDetailScreen = (props: Props) => {
           }}
         />
       </View>
-      <Text style={styles.price}>${selectedProduct.price.toFixed(2)}</Text>
+      <Text style={styles.price}>${selectedProduct.price}</Text>
       <Text style={styles.description}>{selectedProduct.description}</Text>
+      <View style={{ marginTop: 20 }}>
+        <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Recommended Products:</Text>
+        {recommendedProducts.map(product => (
+          <View key={product.id} style={{ marginVertical: 10 }}>
+            <Image style={styles.image} source={{ uri: product.imageUrl }} />
+            <Text>{product.description}</Text>
+            <Text style={styles.price}>${product.price}</Text>
+          </View>
+        ))}
+      </View>
     </ScrollView>
   );
 };

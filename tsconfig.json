@@ -11,7 +11,8 @@
     "forceConsistentCasingInFileNames": true,
     "lib": ["es6", "dom"],
     "moduleResolution": "node",
-    "types": ["node"]
+    "types": ["node"],
+    "typeRoots": ["./types"]
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
   "exclude": ["node_modules"]

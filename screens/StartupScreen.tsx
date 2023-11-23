@@ -18,6 +18,7 @@ const StartupScreen: React.FC = () => {
         return;
       }
       const transformedData = JSON.parse(userData);
+      console.log(transformedData);
       const { token, userId } = transformedData;
 
       if (!token || !userId) {

@@ -54,25 +54,34 @@ const ProductsOverviewScreen: React.FC<Props> = (props) => {
     "78701f3e2c1e8c9d64f822c3f0175eab"
   );
 
-  const [response, setResponse] = useState<any>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+  
   const [error, setError] = useState<string | null>(null);
   const [focus, setFocus] = useState<boolean>(false);
+ 
   const products = useSelector((state: any) => state.products.availableProducts);
+  
   const dispatch = useDispatch<AppDispatch>();
 
   const loadProducts = useCallback(async () => {
     setError(null);
     setIsRefreshing(true);
     try {
-      await dispatch(productsActions.fetchProducts());
+      await dispatch(productsActions.fetchProducts(currentPage));
     } catch (err) {
       setError(err.message);
     }
     setIsRefreshing(false);
   }, [dispatch, setIsLoading, setError]);
 
+  const loadMoreProducts = useCallback(() => {
+    setCurrentPage(prevPage => prevPage + 1);
+    dispatch(productsActions.fetchProducts(currentPage));
+  }, [dispatch, currentPage]);
+
+  
   useEffect(() => {
     const unsubscribe = props.navigation.addListener("focus", loadProducts);
 
@@ -131,7 +140,7 @@ const ProductsOverviewScreen: React.FC<Props> = (props) => {
     );
   }
 
-  if (!isLoading && products.length === 0) {
+  if (products && products.length === 0) {
     return (
       <View style={styles.centered}>
         <Text>No products found. Maybe start adding some!</Text>
@@ -159,6 +168,7 @@ const ProductsOverviewScreen: React.FC<Props> = (props) => {
           onRefresh={loadProducts}
           refreshing={isRefreshing}
           data={products}
+          onEndReached={loadMoreProducts}
           keyExtractor={(item: Product) => item.id}
           renderItem={(itemData: {item: Product}) => (
             <ProductItem

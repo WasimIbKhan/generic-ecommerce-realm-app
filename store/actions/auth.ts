@@ -76,8 +76,8 @@ export const login = (email: string, password: string) => {
       const { token, userId } = response.data;
 
       // Authenticate with Realm using email/password
-      const credentials = Realm.Credentials.emailPassword(email, password);
-      const realmUser = await app.logIn(credentials);
+      //const credentials = Realm.Credentials.emailPassword(email, password);
+      //const realmUser = await app.logIn(credentials);
 
       // Dispatch an action to update Redux store
       dispatch(authenticate(userId, token));

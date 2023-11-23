@@ -1,36 +1,45 @@
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
+import os
+from flask import Flask, request, jsonify
+from pymongo import MongoClient
+from flask_cors import CORS
 
-# %matplotlib inline
-plt.style.use("ggplot")
+app = Flask(__name__)
+CORS(app)
 
-import sklearn
-from sklearn.decomposition import TruncatedSVD
+def convert_to_json(product):
+    product['_id'] = str(product['_id'])  # Convert ObjectId to string
+    return product
 
-df = pd.read_csv('../data/Amazon_Sales_Data.csv')
-amazon_sales_data = amazon_sales_data.dropna()
-amazon_sales_data.head()
+@app.route('/get_recommendations', methods=['POST'])
+def get_recommendations():
+    product_id = request.json['product_id']
 
-amazon_sales_data['rating'] = pd.to_numeric(amazon_sales_data['rating'], errors='coerce')
+    MONGODB_URI = os.environ.get('MONGODB_URI')
+    # Connect to MongoDB
+    client = MongoClient(MONGODB_URI)
+    db = client.ecommerceDB
+    collection = db.products
+    
+    print(f"Fetching recommendations for {product_id}")
+    # Fetch the cluster_id of the given product
+    product = collection.find_one({"product_id": product_id})
+    
+    # Check if the product exists
+    if product is None:
+        client.close()
+        return jsonify({"error": "Product not found"}), 404
 
-# Calculate C, the mean rating across all products
-C = amazon_sales_data['rating'].mean()
+    cluster_id = product['cluster_id']
 
-# Calculate the number of ratings for the 50th percentile (you can adjust this threshold)
-m = amazon_sales_data['product_id'].value_counts().quantile(0.5)
+    # Fetch 5 other products from the same cluster
+    recommended_products = list(collection.find({"cluster_id": cluster_id, "product_id": {"$ne": product_id}}).limit(5))
+    
+    # Convert each product to a JSON-serializable format
+    recommended_products = [convert_to_json(prod) for prod in recommended_products]
 
-# Filter out products that have a number of ratings below the threshold
-qualified_products = amazon_sales_data.groupby('product_id').filter(lambda x: len(x) >= m)
+    client.close()
 
-# Compute the average rating and rating count for each product
-average_ratings = qualified_products.groupby('product_id')['rating'].mean()
-rating_counts = qualified_products.groupby('product_id')['rating'].count()
+    return jsonify(recommended_products)
 
-# Calculate the weighted rating for each product using the IMDb formula
-weighted_ratings = ((rating_counts / (rating_counts + m) * average_ratings) + 
-                    (m / (rating_counts + m) * C))
-
-# Sort products by weighted rating in descending order
-most_popular = weighted_ratings.sort_values(ascending=False)
-
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0')
